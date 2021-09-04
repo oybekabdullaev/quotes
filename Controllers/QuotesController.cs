@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Quotes.Controllers
@@ -9,10 +10,17 @@ namespace Quotes.Controllers
     [Route("api/quotes")]
     public class QuotesController : ControllerBase
     {
-        [HttpGet]
-        public IEnumerable<Quote> GetAll()
+        private readonly IMapper _mapper;
+
+        public QuotesController(IMapper mapper)
         {
-            return Storage.Quotes.ToArray();
+            _mapper = mapper;
+        }
+        
+        [HttpGet]
+        public IEnumerable<QuoteDto> GetAll()
+        {
+            return _mapper.Map<QuoteDto[]>(Storage.Quotes.ToArray());
         }
 
         [HttpGet("{id:int}")]
@@ -23,35 +31,33 @@ namespace Quotes.Controllers
             if (quote == null)
                 return NotFound();
 
-            return Ok(quote);
+            return Ok(_mapper.Map<QuoteDto>(quote));
         }
         
         [HttpGet("categories/{category}")]
-        public IEnumerable<Quote> GetByCategory(QuoteCategory category)
+        public IEnumerable<QuoteDto> GetByCategory(QuoteCategory category)
         {
-            return Storage.Quotes.Where(q => q.QuoteCategory == category).ToArray();
+            return _mapper.Map<QuoteDto[]>(Storage.Quotes.Where(q => q.QuoteCategory == category).ToArray());
         }
         
         [HttpGet("random")]
-        public Quote GetRandom()
+        public QuoteDto GetRandom()
         {
             var index = new Random().Next(0, Storage.Quotes.Count);
-            return Storage.Quotes[index];
+            return _mapper.Map<QuoteDto>(Storage.Quotes[index]);
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult Edit(int id, [FromBody] Quote newQuote)
+        public IActionResult Edit(int id, [FromBody] QuoteDto newQuote)
         {
             var oldQuote = Storage.Quotes.SingleOrDefault(q => q.Id == id);
 
             if (oldQuote == null)
                 return NotFound();
 
-            oldQuote.Author = newQuote.Author;
-            oldQuote.Body = newQuote.Body;
-            oldQuote.QuoteCategory = newQuote.QuoteCategory;
+            _mapper.Map(newQuote, oldQuote);
 
-            return Ok(oldQuote);
+            return Ok(_mapper.Map<QuoteDto>(oldQuote));
         }
 
         [HttpDelete("{id:int}")]
@@ -64,7 +70,7 @@ namespace Quotes.Controllers
 
             Storage.Quotes.Remove(quote);
 
-            return Ok(quote);
+            return Ok(_mapper.Map<QuoteDto>(quote));
         }
     }
 }
