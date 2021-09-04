@@ -4,29 +4,34 @@ namespace Quotes
 {
     public static class Storage
     {
-        public static IEnumerable<Quote> Quotes => new List<Quote>
+        static Storage()
         {
-            new Quote
+            Quotes = new List<Quote>
             {
-                Id = 1,
-                Author = "Author 1",
-                Body = "Body 1",
-                Category = "Category 1"
-            },
-            new Quote
-            {
-                Id = 2,
-                Author = "Author 2",
-                Body = "Body 2",
-                Category = "Category 2"
-            },
-            new Quote
-            {
-                Id = 3,
-                Author = "Author 3",
-                Body = "Body 3",
-                Category = "Category 3"
-            }
-        };
+                new Quote
+                {
+                    Id = 1,
+                    Author = "Author 1",
+                    Body = "Body 1",
+                    QuoteCategory = QuoteCategory.Funny
+                },
+                new Quote
+                {
+                    Id = 2,
+                    Author = "Author 2",
+                    Body = "Body 2",
+                    QuoteCategory = QuoteCategory.Motivational
+                },
+                new Quote
+                {
+                    Id = 3,
+                    Author = "Author 3",
+                    Body = "Body 3",
+                    QuoteCategory = QuoteCategory.Funny
+                }
+            };
+        }
+        
+        public static IList<Quote> Quotes { get; }
     }
 }
